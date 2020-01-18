@@ -1,5 +1,4 @@
 # TIMFlowView
-
 [![CI Status](https://img.shields.io/travis/Tim/TIMFlowView.svg?style=flat)](https://travis-ci.org/Tim/TIMFlowView)
 [![Version](https://img.shields.io/cocoapods/v/TIMFlowView.svg?style=flat)](https://cocoapods.org/pods/TIMFlowView)
 [![License](https://img.shields.io/cocoapods/l/TIMFlowView.svg?style=flat)](https://cocoapods.org/pods/TIMFlowView)
