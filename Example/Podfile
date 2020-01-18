@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'TIMFlowView_Example' do
+  pod 'TIMFlowView', :path => '../'
+
+  target 'TIMFlowView_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
