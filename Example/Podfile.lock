@@ -1,0 +1,16 @@
+PODS:
+  - TIMFlowView (1.0.0)
+
+DEPENDENCIES:
+  - TIMFlowView (from `../`)
+
+EXTERNAL SOURCES:
+  TIMFlowView:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  TIMFlowView: e632a277bf4db70d141038198cf50294127527a6
+
+PODFILE CHECKSUM: af1a95e31f1687d4c68ae8e66eaef4ef978d14a5
+
+COCOAPODS: 1.8.0

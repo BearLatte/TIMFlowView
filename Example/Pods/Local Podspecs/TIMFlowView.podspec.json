@@ -1,0 +1,24 @@
+{
+  "name": "TIMFlowView",
+  "version": "1.0.0",
+  "summary": "Swift 模仿 UITableView 写的一个瀑布流视图",
+  "description": "TODO: Add long description of the pod here.",
+  "homepage": "https://github.com/Tim/TIMFlowView",
+  "license": {
+    "type": "MIT",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "Tim": "TOPshuaiyeai@163.com"
+  },
+  "source": {
+    "git": "https://github.com/Tim/TIMFlowView.git",
+    "tag": "1.0.0"
+  },
+  "platforms": {
+    "ios": "9.0"
+  },
+  "swift_versions": "5.0",
+  "source_files": "TIMFlowView/*.Swift",
+  "swift_version": "5.0"
+}

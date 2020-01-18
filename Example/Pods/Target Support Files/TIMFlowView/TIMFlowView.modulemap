@@ -1,0 +1,6 @@
+framework module TIMFlowView {
+  umbrella header "TIMFlowView-umbrella.h"
+
+  export *
+  module * { export * }
+}
