@@ -1,7 +1,14 @@
-use_frameworks!
+platform :ios, '9.0'
+
+source 'https://github.com/CocoaPods/Specs.git'
 
 target 'TIMFlowView_Example' do
+  use_frameworks!
+  inhibit_all_warnings!
+  
   pod 'TIMFlowView', :path => '../'
+  pod 'KakaJSON'
+  pod 'Kingfisher'
 
   target 'TIMFlowView_Tests' do
     inherit! :search_paths

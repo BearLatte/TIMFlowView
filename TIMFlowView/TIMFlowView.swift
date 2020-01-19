@@ -8,7 +8,7 @@
 
 import UIKit
 
-public class TIMFlowView: UIScrollView {
+open class TIMFlowView: UIScrollView {
     // MARK: - Public Property
     /// 数据源协议
     weak public var dataSource: TIMFlowViewDataSource? = nil

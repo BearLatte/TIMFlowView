@@ -1,16 +1,27 @@
 PODS:
+  - KakaJSON (1.1.1)
+  - Kingfisher (4.10.1)
   - TIMFlowView (1.0.0)
 
 DEPENDENCIES:
+  - KakaJSON
+  - Kingfisher
   - TIMFlowView (from `../`)
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - KakaJSON
+    - Kingfisher
 
 EXTERNAL SOURCES:
   TIMFlowView:
     :path: "../"
 
 SPEC CHECKSUMS:
+  KakaJSON: 18a9fbd9e8381e52751eb6da8536bda8d2944fa1
+  Kingfisher: c148cd7b47ebde9989f6bc7c27dcaa79d81279a0
   TIMFlowView: e632a277bf4db70d141038198cf50294127527a6
 
-PODFILE CHECKSUM: af1a95e31f1687d4c68ae8e66eaef4ef978d14a5
+PODFILE CHECKSUM: b65379eca84b0452fbabfe1cf82034b6d7bb402d
 
 COCOAPODS: 1.8.0
