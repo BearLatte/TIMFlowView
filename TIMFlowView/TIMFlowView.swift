@@ -20,6 +20,32 @@ open class TIMFlowView: UIScrollView {
         }
     }
     
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
+        if #available(iOS 11.0, *) {
+            contentInsetAdjustmentBehavior = .never
+        }
+    }
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    /// 头视图
+    /// 默认与 flowView 同宽，高度根据传进来高度自动计算
+    public var headerView: TIMFlowHeaderView? {
+        willSet {
+            guard let header = newValue else {
+                return
+            }
+            header.layoutIfNeeded()
+            var headerFrame = header.frame
+            headerFrame = CGRect(x: 0, y: 0, width: bounds.width, height: headerFrame.height)
+            newValue?.frame = headerFrame
+            insertSubview(header, at: 0)
+        }
+    }
+    
     
     // MARK: - Private Property
     /// 自定义一个代理对象，设置为私有
@@ -140,10 +166,18 @@ public extension TIMFlowView {
             var cellY: CGFloat = 0
             
             // 获取当前所有列中最大的Y值
-            if maxYOfCellColumn == 0 {
-                cellY = topMargin
+            if headerView == nil {
+                if maxYOfCellColumn == 0 {
+                    cellY = topMargin
+                } else {
+                    cellY = maxYOfCellColumn + rowMargin
+                }
             } else {
-                cellY = maxYOfCellColumn + rowMargin
+                if maxYOfCellColumn == 0 {
+                    cellY = (headerView?.bounds.height)! + topMargin
+                } else {
+                    cellY = maxYOfCellColumn + rowMargin
+                }
             }
             
             let frame = CGRect(x: cellX, y: cellY, width: cellWidth, height: cellH)
@@ -160,6 +194,8 @@ public extension TIMFlowView {
         
         contentH += bottomMargin
         contentSize = CGSize(width: 0, height: contentH)
+        
+        setNeedsLayout()
     }
     
     /// 从缓存池获取 cell

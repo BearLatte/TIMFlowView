@@ -9,6 +9,11 @@
 import Foundation
 
 public protocol TIMFlowViewDataSource: NSObjectProtocol {
+    
+    /// 返回分组数量，默认为 1
+    /// - Parameter flowView: 提供视图给外面设置
+    func numberOfSections(in flowView: TIMFlowView) -> Int
+    
     /// 返回 cell 的数量
     /// - Parameter flowView: 提供视图给外面设置
     func numberOfCells(in flowView: TIMFlowView) -> Int
@@ -25,5 +30,6 @@ public protocol TIMFlowViewDataSource: NSObjectProtocol {
 }
 
 public extension TIMFlowViewDataSource {
+    func numberOfSections(in flowView: TIMFlowView) -> Int { 1 }
     func numberOfColmuns(in flowView: TIMFlowView) -> Int { DEFAULT_COLUMN_COUNT }
 }
