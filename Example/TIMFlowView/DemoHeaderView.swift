@@ -10,17 +10,6 @@ import TIMFlowView
 
 class DemoHeaderView: TIMFlowHeaderView {
     
-    var images: [String] {
-        willSet {
-//            bannerView.imagePaths = newValue
-        }
-    }
-    
-    var titles: [String] {
-        willSet {
-//            bannerView.titles = newValue
-        }
-    }
     
     class func headerView(with height: CGFloat, tapAction: @escaping (_ index: Int) -> Void) -> DemoHeaderView {
         let headerView = self.init(height: height)
@@ -29,9 +18,6 @@ class DemoHeaderView: TIMFlowHeaderView {
     }
     
     override init(frame: CGRect) {
-        images = []
-        titles = []
-        
         super.init(frame: frame)
         setupBannerView()
     }
@@ -43,23 +29,35 @@ class DemoHeaderView: TIMFlowHeaderView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        let margin: CGFloat = 8.0
-        let bannerFrame = CGRect(x: margin, y: margin, width: contentView.bounds.width - 2 * margin, height: contentView.bounds.height - 2 * margin)
-//        bannerView.frame = bannerFrame
+//        contentView.frame = CGRect(x: 8.0, y: 8.0, width: frame.width - 2 * 8.0, height: frame.height - 2 * 8.0)
+        cycleView.frame = contentView.bounds
+        cycleView.itemSize = contentView.bounds.size
     }
     
     private func setupBannerView() {
-//        let banner = LLCycleScrollView.llCycleScrollViewWithFrame(.zero)
-//        banner.coverImage = UIImage(named: "placeholder")?.resizableImage(withCapInsets: UIEdgeInsets(top: 1, left: 1, bottom: 1, right: 1), resizingMode: .tile)
-//        banner.autoScroll = true
-//        banner.autoScrollTimeInterval = 2.0
-//        banner.placeHolderImage = UIImage(named: "placeholder")
-//        banner.scrollDirection = .horizontal
-//        banner.imageViewContentMode = .scaleAspectFit
-//        contentView.addSubview(banner)
-//        bannerView = banner
+        contentView.layer.cornerRadius = 8.0
+        
+        let cycleView = ZCycleView()
+        cycleView.delegate = self
+        cycleView.isInfinite = true
+        cycleView.isAutomatic = true
+        cycleView.timeInterval = 3
+        cycleView.setImagesGroup([#imageLiteral(resourceName: "banner03"), #imageLiteral(resourceName: "banner01"), #imageLiteral(resourceName: "banner02")])
+        cycleView.itemSpacing = 0
+        contentView.addSubview(cycleView)
+        self.cycleView = cycleView
+        
     }
     
-//    private weak var bannerView: LLCycleScrollView!
+    private var cycleView: ZCycleView!
     private var tapAction: ((Int) -> ())? = nil
+}
+
+extension DemoHeaderView: ZCycleViewProtocol {
+    func cycleViewConfigureDefaultCellImage(_ cycleView: ZCycleView, imageView: UIImageView, image: UIImage?, index: Int) {
+        imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 8.0
+        imageView.layer.masksToBounds = true
+        imageView.image = image
+    }
 }

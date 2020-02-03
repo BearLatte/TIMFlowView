@@ -32,6 +32,8 @@ class HeaderDemoController: UIViewController {
             print("点击了第\(index)个banner")
         }
         
+        headerView.layer.cornerRadius = 8.0
+        
         
         let imgs = [
             "https://i.ibb.co/qBmnXTS/allergy.png",
@@ -55,8 +57,8 @@ class HeaderDemoController: UIViewController {
         
         
         
-        headerView.images = imgs
-        headerView.titles = titles
+//        headerView.images = imgs
+//        headerView.titles = titles
         fView.headerView = headerView
         
         view.addSubview(fView)
