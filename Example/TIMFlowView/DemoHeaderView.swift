@@ -29,9 +29,8 @@ class DemoHeaderView: TIMFlowHeaderView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-//        contentView.frame = CGRect(x: 8.0, y: 8.0, width: frame.width - 2 * 8.0, height: frame.height - 2 * 8.0)
+        contentView.frame = CGRect(x: 8.0, y: 8.0, width: frame.width - 2 * 8.0, height: frame.height - 2 * 8.0)
         cycleView.frame = contentView.bounds
-        cycleView.itemSize = contentView.bounds.size
     }
     
     private func setupBannerView() {
@@ -44,6 +43,7 @@ class DemoHeaderView: TIMFlowHeaderView {
         cycleView.timeInterval = 3
         cycleView.setImagesGroup([#imageLiteral(resourceName: "banner03"), #imageLiteral(resourceName: "banner01"), #imageLiteral(resourceName: "banner02")])
         cycleView.itemSpacing = 0
+        cycleView.itemSize = CGSize(width: kScreenWidth - 2 * 8.0, height: kScreenWidth * 0.56 - 2 * 8.0)
         contentView.addSubview(cycleView)
         self.cycleView = cycleView
         

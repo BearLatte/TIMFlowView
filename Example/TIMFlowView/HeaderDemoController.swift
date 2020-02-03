@@ -31,34 +31,6 @@ class HeaderDemoController: UIViewController {
         let headerView = DemoHeaderView.headerView(with: kScreenWidth * 0.56) { (index) in
             print("点击了第\(index)个banner")
         }
-        
-        headerView.layer.cornerRadius = 8.0
-        
-        
-        let imgs = [
-            "https://i.ibb.co/qBmnXTS/allergy.png",
-            "https://i.ibb.co/9wxjxRK/little-door-god.png",
-            "https://i.ibb.co/WK8yW48/Microfilm.png",
-            "https://i.ibb.co/sH53rr0/nezha.png",
-            "https://i.ibb.co/BGy9jqN/recruitment.png",
-            "https://i.ibb.co/2NTHX9T/stronger-brain.png",
-            "https://i.ibb.co/ts4dhWg/years-as-flowers.png"
-        ]
-        
-        let titles = [
-            "如果你对无聊过敏，请来靴小姐挂号",
-            "追光动画 --- 小门神",
-            "微电影演员招募集结号",
-            "哪吒 --- 不认命便是我的命",
-            "我玩我擅长 会乐器可以称霸",
-            "最强大脑新一季",
-            "梁晓雪 首张全创作大碟"
-        ]
-        
-        
-        
-//        headerView.images = imgs
-//        headerView.titles = titles
         fView.headerView = headerView
         
         view.addSubview(fView)
