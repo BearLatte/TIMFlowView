@@ -31,7 +31,7 @@ class HeaderDemoController: UIViewController {
         let headerView = DemoHeaderView.headerView(with: kScreenWidth * 0.56) { (index) in
             print("点击了第\(index)个banner")
         }
-        fView.headerView = headerView
+        fView.flowHeaderView = headerView
         
         view.addSubview(fView)
         flowView = fView
@@ -60,24 +60,23 @@ class HeaderDemoController: UIViewController {
 }
 
 extension HeaderDemoController: TIMFlowViewDataSource {
-    func numberOfCells(in flowView: TIMFlowView) -> Int { flowModels.count }
+    func numberOfColumns(in flowView: TIMFlowView, at section: Int) -> Int { 2 }
+    func numberOfItems(in flowView: TIMFlowView, at section: Int) -> Int { flowModels.count }
     
-    func flowViewCell(in flowView: TIMFlowView, at index: Int) -> TIMFlowViewCell? {
-        let cell = FlowDemoCell.cell(with: flowView)
-        cell?.flowModel = flowModels[index]
-        return cell
+    func flowViewItem(in flowView: TIMFlowView, at indexPath: TIMIndexPath) -> TIMFlowViewItem? {
+        let item = FlowDemoItem.item(with: flowView)
+        item?.flowModel = flowModels[indexPath.item]
+        return item
     }
 }
 
 extension HeaderDemoController: TIMFlowViewDelegate {
-    func numberOfColmuns(in flowView: TIMFlowView) -> Int { 2 }
-    
-    func cellHeight(in flowView: TIMFlowView, at index: Int) -> CGFloat {
-        let model = flowModels[index]
-        return model.height * (flowView.cellWidth / model.width)
+    func itemHeight(in flowView: TIMFlowView, at indexPath: TIMIndexPath) -> CGFloat {
+        let model = flowModels[indexPath.item]
+        return model.height * (flowView.itemWidhth(in: indexPath.section) / model.width)
     }
     
-    func didSelected(in flowView: TIMFlowView, at index: Int) {
-        print("点击了第\(index)个cell")
+    func didSelected(in flowView: TIMFlowView, at indexPath: TIMIndexPath) {
+        print("点击了第\(indexPath.section)个分区的第\(indexPath.item)个item")
     }
 }

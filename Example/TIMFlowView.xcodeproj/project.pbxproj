@@ -16,7 +16,7 @@
 		22801B7723D5FDDD003496EF /* DemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22801B7623D5FDDD003496EF /* DemoViewController.swift */; };
 		22801B7E23D5FDEB003496EF /* HeaderDemoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22801B7823D5FDEA003496EF /* HeaderDemoController.swift */; };
 		22801B7F23D5FDEB003496EF /* CollectionDemoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22801B7923D5FDEA003496EF /* CollectionDemoController.swift */; };
-		22801B8023D5FDEB003496EF /* FlowDemoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22801B7A23D5FDEB003496EF /* FlowDemoCell.swift */; };
+		22801B8023D5FDEB003496EF /* FlowDemoItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22801B7A23D5FDEB003496EF /* FlowDemoItem.swift */; };
 		22801B8123D5FDEB003496EF /* DefaultDemoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22801B7B23D5FDEB003496EF /* DefaultDemoController.swift */; };
 		22801B8223D5FDEB003496EF /* DemoHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22801B7C23D5FDEB003496EF /* DemoHeaderView.swift */; };
 		22801B8323D5FDEB003496EF /* FlowModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22801B7D23D5FDEB003496EF /* FlowModel.swift */; };
@@ -48,7 +48,7 @@
 		22801B7623D5FDDD003496EF /* DemoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoViewController.swift; sourceTree = "<group>"; };
 		22801B7823D5FDEA003496EF /* HeaderDemoController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HeaderDemoController.swift; sourceTree = "<group>"; };
 		22801B7923D5FDEA003496EF /* CollectionDemoController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionDemoController.swift; sourceTree = "<group>"; };
-		22801B7A23D5FDEB003496EF /* FlowDemoCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowDemoCell.swift; sourceTree = "<group>"; };
+		22801B7A23D5FDEB003496EF /* FlowDemoItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowDemoItem.swift; sourceTree = "<group>"; };
 		22801B7B23D5FDEB003496EF /* DefaultDemoController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefaultDemoController.swift; sourceTree = "<group>"; };
 		22801B7C23D5FDEB003496EF /* DemoHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoHeaderView.swift; sourceTree = "<group>"; };
 		22801B7D23D5FDEB003496EF /* FlowModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlowModel.swift; sourceTree = "<group>"; };
@@ -152,7 +152,7 @@
 				22801B7923D5FDEA003496EF /* CollectionDemoController.swift */,
 				22801B7B23D5FDEB003496EF /* DefaultDemoController.swift */,
 				22801B7C23D5FDEB003496EF /* DemoHeaderView.swift */,
-				22801B7A23D5FDEB003496EF /* FlowDemoCell.swift */,
+				22801B7A23D5FDEB003496EF /* FlowDemoItem.swift */,
 				22801B7D23D5FDEB003496EF /* FlowModel.swift */,
 				22801B7823D5FDEA003496EF /* HeaderDemoController.swift */,
 				22801B7623D5FDDD003496EF /* DemoViewController.swift */,
@@ -381,7 +381,7 @@
 				2246D1D723E86366005B7485 /* ZCycleViewCell.swift in Sources */,
 				2246D1D923E86366005B7485 /* ZPageControl.swift in Sources */,
 				22801B7323D5FDC5003496EF /* AppDelegate.swift in Sources */,
-				22801B8023D5FDEB003496EF /* FlowDemoCell.swift in Sources */,
+				22801B8023D5FDEB003496EF /* FlowDemoItem.swift in Sources */,
 				22801B7723D5FDDD003496EF /* DemoViewController.swift in Sources */,
 				22801B8323D5FDEB003496EF /* FlowModel.swift in Sources */,
 				2246D1D823E86366005B7485 /* ZCycleLayout.swift in Sources */,

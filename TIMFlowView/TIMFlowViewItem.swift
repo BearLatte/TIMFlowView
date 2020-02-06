@@ -8,7 +8,7 @@
 
 import UIKit
 
-open class TIMFlowViewCell: UIView {
+open class TIMFlowViewItem: UIView {
     /// 重用标识符
     internal var reuseIdentifier: String
     

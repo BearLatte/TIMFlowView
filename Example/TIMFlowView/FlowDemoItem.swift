@@ -1,5 +1,5 @@
 //
-//  FlowDemoCell.swift
+//  FlowDemoItem.swift
 //  TIMFlowView_Example
 //
 //  Created by Tim's Mac Book Pro on 2020/1/19.
@@ -9,7 +9,7 @@
 import TIMFlowView
 import Kingfisher
 
-class FlowDemoCell: TIMFlowViewCell {
+class FlowDemoItem: TIMFlowViewItem {
     
     /// 模型
     var flowModel: FlowModel? {
@@ -20,12 +20,17 @@ class FlowDemoCell: TIMFlowViewCell {
         }
     }
     
-    class func cell(with flowView: TIMFlowView) -> FlowDemoCell? {
-        let flowCellId = "CellID"
-        guard let cell = flowView.dequeueReuseable(identifier: flowCellId) else {
-            return FlowDemoCell(with: flowCellId)
+    class func item(with flowView: TIMFlowView) -> FlowDemoItem? {
+        let flowItemId = "CellID"
+        guard let item = flowView.dequeueReuseableItem(with: flowItemId) else {
+            return FlowDemoItem(with: flowItemId)
         }
-        return cell as? FlowDemoCell
+        
+        return item as? FlowDemoItem
+//        guard let cell = flowView.dequeueReuseable(identifier: flowCellId) else {
+//            return FlowDemoCell(with: flowCellId)
+//        }
+//        return cell as? FlowDemoCell
     }
     
     override init(frame: CGRect) {
