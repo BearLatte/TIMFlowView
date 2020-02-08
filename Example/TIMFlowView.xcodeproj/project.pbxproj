@@ -11,6 +11,7 @@
 		2246D1D723E86366005B7485 /* ZCycleViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2246D1D323E86366005B7485 /* ZCycleViewCell.swift */; };
 		2246D1D823E86366005B7485 /* ZCycleLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2246D1D423E86366005B7485 /* ZCycleLayout.swift */; };
 		2246D1D923E86366005B7485 /* ZPageControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2246D1D523E86366005B7485 /* ZPageControl.swift */; };
+		2246D1DD23EE8AEC005B7485 /* DemoSectionHeaderFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2246D1DC23EE8AEC005B7485 /* DemoSectionHeaderFooterView.swift */; };
 		22801B7323D5FDC5003496EF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22801B7223D5FDC5003496EF /* AppDelegate.swift */; };
 		22801B7523D5FDD5003496EF /* images.plist in Resources */ = {isa = PBXBuildFile; fileRef = 22801B7423D5FDD5003496EF /* images.plist */; };
 		22801B7723D5FDDD003496EF /* DemoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22801B7623D5FDDD003496EF /* DemoViewController.swift */; };
@@ -43,6 +44,7 @@
 		2246D1D323E86366005B7485 /* ZCycleViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZCycleViewCell.swift; sourceTree = "<group>"; };
 		2246D1D423E86366005B7485 /* ZCycleLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZCycleLayout.swift; sourceTree = "<group>"; };
 		2246D1D523E86366005B7485 /* ZPageControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZPageControl.swift; sourceTree = "<group>"; };
+		2246D1DC23EE8AEC005B7485 /* DemoSectionHeaderFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoSectionHeaderFooterView.swift; sourceTree = "<group>"; };
 		22801B7223D5FDC5003496EF /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		22801B7423D5FDD5003496EF /* images.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = images.plist; sourceTree = "<group>"; };
 		22801B7623D5FDDD003496EF /* DemoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoViewController.swift; sourceTree = "<group>"; };
@@ -152,6 +154,7 @@
 				22801B7923D5FDEA003496EF /* CollectionDemoController.swift */,
 				22801B7B23D5FDEB003496EF /* DefaultDemoController.swift */,
 				22801B7C23D5FDEB003496EF /* DemoHeaderView.swift */,
+				2246D1DC23EE8AEC005B7485 /* DemoSectionHeaderFooterView.swift */,
 				22801B7A23D5FDEB003496EF /* FlowDemoItem.swift */,
 				22801B7D23D5FDEB003496EF /* FlowModel.swift */,
 				22801B7823D5FDEA003496EF /* HeaderDemoController.swift */,
@@ -386,6 +389,7 @@
 				22801B8323D5FDEB003496EF /* FlowModel.swift in Sources */,
 				2246D1D823E86366005B7485 /* ZCycleLayout.swift in Sources */,
 				22801B8223D5FDEB003496EF /* DemoHeaderView.swift in Sources */,
+				2246D1DD23EE8AEC005B7485 /* DemoSectionHeaderFooterView.swift in Sources */,
 				22801B7F23D5FDEB003496EF /* CollectionDemoController.swift in Sources */,
 				22801B8123D5FDEB003496EF /* DefaultDemoController.swift in Sources */,
 				22801B7E23D5FDEB003496EF /* HeaderDemoController.swift in Sources */,

@@ -18,13 +18,14 @@ class CollectionDemoController: UIViewController {
         setupFlowView()
         setupData()
     }
-    
+
     private func setupFlowView() {
        let fView = TIMFlowView()
        fView.frame = view.bounds
        fView.contentInset = UIEdgeInsets(top: isIphoneX ? 88.0 : 64.0, left: 0, bottom: 0, right: 0)
-       fView.dataSource = self
-       fView.delegate   = self
+       fView.flowDataSource = self
+       fView.flowDelegate   = self
+       fView.floatingHeaderEnable = true
        fView.backgroundColor = UIColor.orange
        
        // 添加 banner 视图
@@ -68,11 +69,11 @@ extension CollectionDemoController: TIMFlowViewDataSource {
         case 1:
             return 2
         default:
-            return 5
+            return 3
         }
     }
     
-    func numberOfSections(in flowView: TIMFlowView) -> Int { 3 }
+    func numberOfSections(in flowView: TIMFlowView) -> Int { 20 }
     func numberOfItems(in flowView: TIMFlowView, at section: Int) -> Int {
         switch section {
         case 0:
@@ -80,7 +81,7 @@ extension CollectionDemoController: TIMFlowViewDataSource {
         case 1:
             return flowModels.count
         default:
-            return 80
+            return 9
         }
     }
     
@@ -125,21 +126,13 @@ extension CollectionDemoController: TIMFlowViewDelegate {
             let model = flowModels[indexPath.item]
             return model.height * (flowView.itemWidhth(in: indexPath.section) / model.width)
         default:
-            return 100.0
+            return 80.0
         }
     }
     
-    
-    func viewForSectionHeader<V>(in flowView: TIMFlowView, at section: Int) -> V? where V : TIMFlowHeaderFooterView {
-        let headerID = "headerID"
-        var headerView: V?
-        guard let header = flowView.dequeueReuseableSectionHeaderView(with: headerID) as? V else {
-            headerView = TIMFlowHeaderFooterView(with: headerID) as? V
-            headerView?.backgroundColor = #colorLiteral(red: 0.9568627477, green: 0.6588235497, blue: 0.5450980663, alpha: 1)
-            headerView?.frame = CGRect(x: 0, y: 0, width: 0, height: 80.0)
-            return headerView
-        }
-        headerView = header
+    func viewForSectionHeader(in flowView: TIMFlowView, at section: Int) -> TIMFlowHeaderFooterView? {
+        let headerView = DemoSectionHeaderFooterView.headerFooterView(with: flowView)
+        headerView?.sectionIndex = section
         return headerView
     }
 }

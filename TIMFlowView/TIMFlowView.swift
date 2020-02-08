@@ -10,21 +10,21 @@ import UIKit
 
 open class TIMFlowView: UIScrollView {
     // MARK: - Public Property
-    /// 数据源协议
-    open weak var dataSource: TIMFlowViewDataSource? = nil
+    /// 瀑布流数据源协议
+    open weak var flowDataSource: TIMFlowViewDataSource? = nil
     
-    /// 代理协议
-    open override var delegate: UIScrollViewDelegate? {
-        didSet {
-            flowViewDelegate = delegate as? TIMFlowViewDelegate
-        }
-    }
+    /// 瀑布流代理协议
+    open weak var flowDelegate: TIMFlowViewDelegate?
+    
+    /// 是否让分区头视图悬停
+    public var floatingHeaderEnable: Bool = false
     
     public override init(frame: CGRect) {
         super.init(frame: frame)
         if #available(iOS 11.0, *) {
             contentInsetAdjustmentBehavior = .never
         }
+        delegate = self
     }
     
     required public init?(coder: NSCoder) {
@@ -41,16 +41,14 @@ open class TIMFlowView: UIScrollView {
             header.layoutIfNeeded()
             var headerFrame = header.frame
             headerFrame = CGRect(x: 0, y: 0, width: bounds.width, height: headerFrame.height)
-            newValue?.frame = headerFrame
+            header.frame = headerFrame
             insertSubview(header, at: 0)
+            floatingBeginY = header.frame.maxY
         }
     }
     
     
     // MARK: - Private Property
-    /// 自定义一个代理对象，设置为私有
-    /// 为了解决 UIScrollViewDelegate 和自定义 delegate 同名的冲突
-    private weak var flowViewDelegate: TIMFlowViewDelegate? = nil
     
     /// 所有 cell 的位置信息, key: section, value: section 对应的 cell 的frame
     private lazy var itemFrames: [Int: [CGRect]] = [:]
@@ -78,6 +76,27 @@ open class TIMFlowView: UIScrollView {
     
     /// 分区尾缓存池，存放已经划出屏幕 frame 的 分区尾视图
     private lazy var reuseableSectionFooter: Set<TIMFlowHeaderFooterView> = []
+    
+    /// 记录初始的偏移点
+    private var originOffsetY: CGFloat? = nil
+
+    /// 需要悬停的header
+    private var needFloatingHeader: [Int: TIMFlowHeaderFooterView] = [:]
+    
+    /// 记录当前偏移量
+    private var offsetY: CGFloat = 0
+    
+    /// 记录初始 Y 值，也就是说在哪个位置开始悬停
+    private var floatingBeginY: CGFloat = 0
+    
+    /// 记录当前悬停的视图索引
+    private var currentFloatingIndex = 0
+
+    /// 记录当前悬停的视图
+    private var currentFloatingHeaderView: TIMFlowHeaderFooterView?
+    
+    /// 记录临界点
+    private var criticalY: CGFloat = 0
 }
 
 // MARK: - Life Cycle
@@ -94,24 +113,35 @@ extension TIMFlowView {
         // 待研究更理想的算法
         
         // 获取分区数
-        let numberOfSection: Int! = dataSource?.numberOfSections(in: self)
+        let numberOfSection: Int! = flowDataSource?.numberOfSections(in: self)
         
         for sectionIndex in 0 ..< numberOfSection {
             // 布局分区头视图
-            if let sectionHeaderFrame = sectionHeaderFrames[sectionIndex] {
-                var sectionHeader = displayingSectionHeader[sectionIndex]
-                if isInScreen(aFrame: sectionHeaderFrame) {
-                    if sectionHeader == nil {
-                        sectionHeader = flowViewDelegate?.viewForSectionHeader(in: self, at: sectionIndex)
-                        sectionHeader?.frame = sectionHeaderFrame
-                        addSubview(sectionHeader!)
-                        displayingSectionHeader[sectionIndex] = sectionHeader
-                    }
-                } else {
-                    if sectionHeader != nil {
-                        sectionHeader?.removeFromSuperview()
-                        displayingSectionHeader.removeValue(forKey: sectionIndex)
-                        reuseableSectionHeader.insert(sectionHeader!)
+            if floatingHeaderEnable {
+                guard let headerView = needFloatingHeader[sectionIndex] else {
+                    return
+                }
+                
+                if isInScreen(aFrame: headerView.frame) {
+                    addSubview(headerView)
+                }
+                
+            } else {
+                if let sectionHeaderFrame = sectionHeaderFrames[sectionIndex] {
+                    var sectionHeader = displayingSectionHeader[sectionIndex]
+                    if isInScreen(aFrame: sectionHeaderFrame) {
+                        if sectionHeader == nil {
+                            sectionHeader = flowDelegate?.viewForSectionHeader(in: self, at: sectionIndex)
+                            sectionHeader?.frame = sectionHeaderFrame
+                            addSubview(sectionHeader!)
+                            displayingSectionHeader[sectionIndex] = sectionHeader
+                        }
+                    } else {
+                        if sectionHeader != nil {
+                            sectionHeader?.removeFromSuperview()
+                            displayingSectionHeader.removeValue(forKey: sectionIndex)
+                            reuseableSectionHeader.insert(sectionHeader!)
+                        }
                     }
                 }
             }
@@ -132,7 +162,7 @@ extension TIMFlowView {
                 
                 if isInScreen(aFrame: itemFrame) {
                     if item == nil {
-                        item = dataSource?.flowViewItem(in: self, at: indexPath)
+                        item = flowDataSource?.flowViewItem(in: self, at: indexPath)
                         item?.frame = itemFrame
                         addSubview(item!)
                         displayingItems[indexPath] = item
@@ -151,7 +181,7 @@ extension TIMFlowView {
                 var sectionFooter = displayingSectionFooter[sectionIndex]
                 if isInScreen(aFrame: sectionFooterFrame) {
                     if sectionFooter == nil {
-                        sectionFooter = flowViewDelegate?.viewForSectionFooter(in: self, at: sectionIndex)
+                        sectionFooter = flowDelegate?.viewForSectionFooter(in: self, at: sectionIndex)
                         sectionFooter?.frame = sectionFooterFrame
                         addSubview(sectionFooter!)
                         displayingSectionFooter[sectionIndex] = sectionFooter
@@ -172,7 +202,7 @@ extension TIMFlowView {
 public extension TIMFlowView {
     /// 根据 self 的宽度计算 cell 的宽度
     func itemWidhth(in section: Int) -> CGFloat {
-        guard let numberOfSections = dataSource?.numberOfSections(in: self) else {
+        guard let numberOfSections = flowDataSource?.numberOfSections(in: self) else {
             return 0
         }
         
@@ -182,10 +212,10 @@ public extension TIMFlowView {
         }
         
         // 获取列数
-        guard let numberOfColumns = dataSource?.numberOfColumns(in: self, at: section),
-            let leftMargin = flowViewDelegate?.margin(in: self, at: section, for: .left),
-            let rightMrgin = flowViewDelegate?.margin(in: self, at: section, for: .right),
-            let columnMargin = flowViewDelegate?.margin(in: self, at: section, for: .column) else {
+        guard let numberOfColumns = flowDataSource?.numberOfColumns(in: self, at: section),
+            let leftMargin = flowDelegate?.margin(in: self, at: section, for: .left),
+            let rightMrgin = flowDelegate?.margin(in: self, at: section, for: .right),
+            let columnMargin = flowDelegate?.margin(in: self, at: section, for: .column) else {
             return 0
         }
         
@@ -194,115 +224,142 @@ public extension TIMFlowView {
     
     /// 刷新当前数据
     func reloadData() {
-    // 将当前显示的所有 cell 从父视图移除
-    displayingItems.forEach { (key, value) in
-        value.removeFromSuperview()
-    }
-    
-    // 删除所有正在显示的cell
-    displayingItems.removeAll()
-    
-
-    // 删除所有 frame 的缓存
-    itemFrames.removeAll()
-
-    // 清空缓存池
-    reuseableItems.removeAll()
-    
-    // 获取分区数
-    guard let numberOfSections: Int = dataSource?.numberOfSections(in: self) else {
-        return
-    }
+        // 删除所有的分区头视图
+        displayingSectionHeader.forEach { (_, value) in
+            value.removeFromSuperview()
+        }
         
-    for _ in 0 ..< numberOfSections {
-        sectionHeaderFrames.append(nil)
-        sectionFooterFrames.append(nil)
-    }
-    
-    // 保留一个记录最大 Y 值的对象
-    var maxY = flowHeaderView == nil ? 0.0 : flowHeaderView?.frame.height ??  0.0
-    
-        // 根据分区计算每个 header、footer、cell 的 frame
-        for sectionIndex in 0 ..< numberOfSections {
-            // 保存 item 的宽度
-            let itemW = self.itemWidhth(in: sectionIndex)
+        displayingSectionHeader.removeAll()
+        sectionHeaderFrames.removeAll()
+        reuseableSectionHeader.removeAll()
+        
+        // 将当前显示的所有 cell 从父视图移除
+        displayingItems.forEach { (_, value) in
+            value.removeFromSuperview()
+        }
+        
+        // 删除所有正在显示的cell
+        displayingItems.removeAll()
+        
+
+        // 删除所有 frame 的缓存
+        itemFrames.removeAll()
+
+        // 清空缓存池
+        reuseableItems.removeAll()
+        
+        // 删除分区尾视图
+        displayingSectionFooter.forEach { (_, value) in
+            value.removeFromSuperview()
+        }
+        displayingSectionFooter.removeAll()
+        sectionFooterFrames.removeAll()
+        reuseableSectionFooter.removeAll()
+        
+        // 删除保留的悬停数据
+        needFloatingHeader.forEach { (_, value) in
+            value.removeFromSuperview()
+        }
+        needFloatingHeader.removeAll()
+        
+        // 获取分区数
+        guard let numberOfSections: Int = flowDataSource?.numberOfSections(in: self) else {
+            return
+        }
             
-            // 获取列数
-            let columns = self.numberOfColumns(section: sectionIndex)
-            
-            // 获取当前分区的 cell 的数量
-            let numberOfItems = (self.dataSource?.numberOfItems(in: self, at: sectionIndex))!
-            
-            // 获取当前分区的间距设置
-            let topMargin    = self.margin(at: sectionIndex, for: .top)
-            let leftMargin   = self.margin(at: sectionIndex, for: .left)
-            let bottomMargin = self.margin(at: sectionIndex, for: .bottom)
-            let columnMargin = self.margin(at: sectionIndex, for: .column)
-            let rowMargin    = self.margin(at: sectionIndex, for: .row)
-            
-            // 获取当前分区的头视图
-            if let sectionHeaederView = self.flowViewDelegate?.viewForSectionHeader(in: self, at: sectionIndex) {
-                let sectionFrame = CGRect(x: 0, y: maxY, width: self.bounds.width, height: sectionHeaederView.frame.height)
-                self.sectionHeaderFrames[sectionIndex] = sectionFrame
-                maxY = sectionFrame.maxY
-            }
-            
-            // 计算某一列的最大Y值
-            var maxYOfColumns: [CGFloat] = []
-            for _ in 0 ..< columns {
-                maxYOfColumns.append(maxY)
-            }
-            
-            // 计算每个 item 的 frame
-            var itemFrames: [CGRect] = []
-            for itemIndex in 0 ..< numberOfItems {
-                let itemH = self.height(at: TIMIndexPath(sectionIndex, itemIndex))       // 高度
-                var itemColumn = 0                                                  // 当前列索引
-                var maxYOfItemColumn = maxYOfColumns[itemColumn]                    // 取出第一列的Y值
+        for _ in 0 ..< numberOfSections {
+            sectionHeaderFrames.append(nil)
+            sectionFooterFrames.append(nil)
+        }
+        
+        // 保留一个记录最大 Y 值的对象
+        var maxY = flowHeaderView == nil ? 0.0 : flowHeaderView?.frame.height ??  0.0
+        
+            // 根据分区计算每个 header、footer、cell 的 frame
+            for sectionIndex in 0 ..< numberOfSections {
+                // 保存 item 的宽度
+                let itemW = self.itemWidhth(in: sectionIndex)
                 
-                for i in 0 ..< columns {
-                    if maxYOfColumns[i] < maxYOfItemColumn {
-                        itemColumn = i
-                        maxYOfItemColumn = maxYOfColumns[i]
+                // 获取列数
+                let columns = self.numberOfColumns(section: sectionIndex)
+                
+                // 获取当前分区的 cell 的数量
+                let numberOfItems = (self.flowDataSource?.numberOfItems(in: self, at: sectionIndex))!
+                
+                // 获取当前分区的间距设置
+                let topMargin    = self.margin(at: sectionIndex, for: .top)
+                let leftMargin   = self.margin(at: sectionIndex, for: .left)
+                let bottomMargin = self.margin(at: sectionIndex, for: .bottom)
+                let columnMargin = self.margin(at: sectionIndex, for: .column)
+                let rowMargin    = self.margin(at: sectionIndex, for: .row)
+                
+                // 获取当前分区的头视图
+                if let sectionHeaederView = self.flowDelegate?.viewForSectionHeader(in: self, at: sectionIndex) {
+                    let sectionFrame = CGRect(x: 0, y: maxY, width: self.bounds.width, height: sectionHeaederView.frame.height)
+                    self.sectionHeaderFrames[sectionIndex] = sectionFrame
+                    if floatingHeaderEnable == true {
+                        sectionHeaederView.frame = sectionFrame
+                        needFloatingHeader[sectionIndex] = sectionHeaederView
+                    }
+                    maxY = sectionFrame.maxY
+                }
+                
+                // 计算某一列的最大Y值
+                var maxYOfColumns: [CGFloat] = []
+                for _ in 0 ..< columns {
+                    maxYOfColumns.append(maxY)
+                }
+                
+                // 计算每个 item 的 frame
+                var itemFrames: [CGRect] = []
+                for itemIndex in 0 ..< numberOfItems {
+                    let itemH = self.height(at: TIMIndexPath(sectionIndex, itemIndex))       // 高度
+                    var itemColumn = 0                                                  // 当前列索引
+                    var maxYOfItemColumn = maxYOfColumns[itemColumn]                    // 取出第一列的Y值
+                    
+                    for i in 0 ..< columns {
+                        if maxYOfColumns[i] < maxYOfItemColumn {
+                            itemColumn = i
+                            maxYOfItemColumn = maxYOfColumns[i]
+                        }
+                    }
+                    
+                    // 计算 item 的 x 坐标
+                    let itemX: CGFloat = leftMargin + CGFloat(itemColumn) * (columnMargin + itemW)
+                    var itemY: CGFloat = 0
+                    
+                    if maxYOfItemColumn == maxY {
+                        itemY = maxYOfItemColumn + topMargin
+                    } else {
+                        itemY = maxYOfItemColumn + rowMargin
+                    }
+                    
+                    let frame = CGRect(x: itemX, y: itemY, width: itemW, height: itemH)
+                    itemFrames.append(frame)
+                    maxYOfColumns[itemColumn] = frame.maxY
+                }
+                
+                self.itemFrames[sectionIndex] = itemFrames
+                
+                // 计算当前最大Y值
+                maxY = maxYOfColumns[0]
+                for i in 0 ..< maxYOfColumns.count {
+                    if maxY < maxYOfColumns[i] {
+                        maxY = maxYOfColumns[i]
                     }
                 }
                 
-                // 计算 item 的 x 坐标
-                let itemX: CGFloat = leftMargin + CGFloat(itemColumn) * (columnMargin + itemW)
-                var itemY: CGFloat = 0
-                
-                if maxYOfItemColumn == maxY {
-                    itemY = maxYOfItemColumn + topMargin
-                } else {
-                    itemY = maxYOfItemColumn + rowMargin
+                if let sectionFooterView = self.flowDelegate?.viewForSectionFooter(in: self, at: sectionIndex) {
+                    let footerFrame = CGRect(x: 0, y: maxY + bottomMargin, width: self.bounds.width, height: sectionFooterView.frame.height)
+                    self.sectionFooterFrames[sectionIndex] = footerFrame
+                    maxY = footerFrame.maxY
                 }
                 
-                let frame = CGRect(x: itemX, y: itemY, width: itemW, height: itemH)
-                itemFrames.append(frame)
-                maxYOfColumns[itemColumn] = frame.maxY
+                maxY = maxY + bottomMargin
             }
             
-            self.itemFrames[sectionIndex] = itemFrames
-            
-            // 计算当前最大Y值
-            maxY = maxYOfColumns[0]
-            for i in 0 ..< maxYOfColumns.count {
-                if maxY < maxYOfColumns[i] {
-                    maxY = maxYOfColumns[i]
-                }
-            }
-            
-            if let sectionFooterView = self.flowViewDelegate?.viewForSectionFooter(in: self, at: sectionIndex) {
-                let footerFrame = CGRect(x: 0, y: maxY + bottomMargin, width: self.bounds.width, height: sectionFooterView.frame.height)
-                self.sectionFooterFrames[sectionIndex] = footerFrame
-                maxY = footerFrame.maxY
-            }
-            
-            maxY = maxY + bottomMargin
-        }
-        
-        self.contentSize = CGSize(width: 0, height: maxY)
-        self.setNeedsLayout()
+            self.contentSize = CGSize(width: 0, height: maxY)
+            self.setNeedsLayout()
     }
     
     // 从缓存池中获取 item
@@ -326,11 +383,11 @@ public extension TIMFlowView {
     }
     
     // 从缓存池中获取分区头视图
-    func dequeueReuseableSectionHeaderView<V: TIMFlowHeaderFooterView>(with identifier: String) -> V? {
-        var reuseHeader: V?
+    func dequeueReuseableSectionHeaderView<Header: TIMFlowHeaderFooterView>(with identifier: String) -> Header? {
+        var reuseHeader: Header?
         for (_, header) in reuseableSectionHeader.enumerated() {
             if header.reuseIdentifier == identifier {
-                reuseHeader = header as? V
+                reuseHeader = header as? Header
                 break
             }
         }
@@ -343,7 +400,7 @@ public extension TIMFlowView {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if flowViewDelegate == nil {
+        if flowDelegate == nil {
             return
         }
         
@@ -361,7 +418,7 @@ public extension TIMFlowView {
         }
         
         if selectedIndexPath != nil {
-            flowViewDelegate?.didSelected(in: self, at: selectedIndexPath!)
+            flowDelegate?.didSelected(in: self, at: selectedIndexPath!)
         }
     }
 }
@@ -374,7 +431,7 @@ extension TIMFlowView {
     
     
     private func margin(at section: Int, for type: TIMFlowViewCellMarginType) -> CGFloat {
-        if let margin = flowViewDelegate?.margin(in: self, at: section, for: type) {
+        if let margin = flowDelegate?.margin(in: self, at: section, for: type) {
             return margin
         }
         
@@ -384,7 +441,7 @@ extension TIMFlowView {
     
     
     private func numberOfColumns(section: Int) -> Int {
-        if let columns = dataSource?.numberOfColumns(in: self, at: section){
+        if let columns = flowDataSource?.numberOfColumns(in: self, at: section){
             return columns
         }
         
@@ -393,10 +450,105 @@ extension TIMFlowView {
     
     private func height(at indexPath: TIMIndexPath) -> CGFloat {
         
-        if let height = flowViewDelegate?.itemHeight(in: self, at: indexPath) {
+        if let height = flowDelegate?.itemHeight(in: self, at: indexPath) {
             return height
         }
         
         return DEFAULT_CELL_HEIGHT
     }
+}
+
+
+extension TIMFlowView: UIScrollViewDelegate {
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if originOffsetY == nil {
+            originOffsetY = abs(contentOffset.y)
+        }
+        
+        if floatingHeaderEnable {
+            offsetY = contentOffset.y + originOffsetY!
+            
+            if offsetY <= 0 {
+                return
+            }
+            
+            if offsetY >= floatingBeginY {
+                guard let floatingHeader = needFloatingHeader[currentFloatingIndex] else {
+                    return
+                }
+                
+                floatingHeader.frame = CGRect(x: 0, y: frame.minY + originOffsetY!, width: floatingHeader.bounds.width, height: floatingHeader.bounds.height)
+                
+                let controller = topViewController((UIApplication.shared.keyWindow?.rootViewController)!)
+                controller.view.addSubview(floatingHeader)
+                
+                // 取出当前索引分区内的item的frames，并获取当前分区的最大Y值
+                var sectionMaxY: CGFloat = 0
+                if let itemFrames = itemFrames[currentFloatingIndex] {
+                    for i in 0 ..< itemFrames.count {
+                        sectionMaxY < itemFrames[i].maxY ? (sectionMaxY = itemFrames[i].maxY) : (sectionMaxY = sectionMaxY)
+                    }
+                }
+                
+                sectionMaxY += flowDelegate?.margin(in: self, at: currentFloatingIndex, for: .bottom) ?? 0
+                
+                
+                if offsetY >= (sectionMaxY - floatingHeader.bounds.height) && offsetY < sectionMaxY {
+                    let animationY = currentFloatingHeaderView!.frame.minY - (offsetY - (sectionMaxY - floatingHeader.bounds.height))
+                    currentFloatingHeaderView?.frame = CGRect(x: 0, y:animationY , width: currentFloatingHeaderView!.bounds.width, height: currentFloatingHeaderView!.bounds.height)
+                }
+                
+                if offsetY > sectionMaxY {
+                    
+                    currentFloatingHeaderView?.frame = (sectionHeaderFrames[currentFloatingIndex])!
+                    addSubview(currentFloatingHeaderView!)
+                    
+                    currentFloatingIndex += 1
+                    floatingBeginY = sectionMaxY
+                }
+                
+                currentFloatingHeaderView = floatingHeader
+            } else {
+                // 获取当前索引分区的最小 Y 值
+                guard let minY = sectionHeaderFrames[currentFloatingIndex]?.minY else {
+                    return
+                }
+                
+                
+                if offsetY <= minY && currentFloatingIndex != 0 {
+                    currentFloatingHeaderView?.frame = sectionHeaderFrames[currentFloatingIndex]!
+                    addSubview(currentFloatingHeaderView!)
+                    
+                    currentFloatingIndex -= 1
+                    floatingBeginY = (sectionHeaderFrames[currentFloatingIndex]?.minY)!
+                }
+                
+                guard let floatingHeader = needFloatingHeader[currentFloatingIndex] else {
+                    return
+                }
+                
+                floatingHeader.frame = CGRect(x: 0, y: frame.minY + originOffsetY!, width: floatingHeader.bounds.width, height: floatingHeader.bounds.height)
+                UIApplication.shared.keyWindow?.addSubview(floatingHeader)
+                currentFloatingHeaderView = floatingHeader
+                
+                if currentFloatingIndex == 0 && currentFloatingHeaderView != nil {
+                    currentFloatingHeaderView?.frame = sectionHeaderFrames[currentFloatingIndex]!
+                    addSubview(currentFloatingHeaderView!)
+                }
+                
+            }
+        }
+    }
+    
+    /// 获取当前最顶层的控制器
+    func topViewController(_ vc: UIViewController) -> UIViewController {
+        if vc.isKind(of: UITabBarController.self) {
+            return topViewController((vc as! UITabBarController).selectedViewController!)
+        } else if vc.isKind(of: UINavigationController.self) {
+            return topViewController((vc as! UINavigationController).topViewController!)
+        } else {
+            return vc
+        }
+    }
+
 }

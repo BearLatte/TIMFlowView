@@ -29,19 +29,19 @@ public protocol TIMFlowViewDelegate: UIScrollViewDelegate {
     /// - Parameters:
     ///   - flowView: 提供瀑布流视图给外部使用
     ///   - sectionIndex: 分区索引
-    func viewForSectionHeader<V: TIMFlowHeaderFooterView>(in flowView: TIMFlowView, at section: Int) -> V?
+    func viewForSectionHeader(in flowView: TIMFlowView, at section: Int) -> TIMFlowHeaderFooterView?
     
     /// 分区尾视图
     /// - Parameters:
     ///   - flowView: 提供瀑布流视图给外部使用
     ///   - sectionIndex: 分区索引
-    func viewForSectionFooter<V: TIMFlowHeaderFooterView>(in flowView: TIMFlowView, at section: Int) -> V?
+    func viewForSectionFooter(in flowView: TIMFlowView, at section: Int) -> TIMFlowHeaderFooterView?
 }
 
 public extension TIMFlowViewDelegate {
     func itemHeight(in flowView: TIMFlowView, at indexPath: TIMIndexPath) -> CGFloat { DEFAULT_CELL_HEIGHT }
     func margin(in flowView: TIMFlowView, at section: Int, for marginType: TIMFlowViewCellMarginType) -> CGFloat { DEFAULT_CELL_MARGIN }
     func didSelected(in flowView: TIMFlowView, at indexPath: TIMIndexPath)  { }
-    func viewForSectionHeader<V: TIMFlowHeaderFooterView>(in flowView: TIMFlowView, at section: Int) -> V? { nil }
-    func viewForSectionFooter<V: TIMFlowHeaderFooterView>(in flowView: TIMFlowView, at section: Int) -> V? { nil }
+    func viewForSectionHeader(in flowView: TIMFlowView, at section: Int) -> TIMFlowHeaderFooterView? { nil }
+    func viewForSectionFooter(in flowView: TIMFlowView, at section: Int) -> TIMFlowHeaderFooterView? { nil }
 }

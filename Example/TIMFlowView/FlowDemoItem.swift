@@ -27,10 +27,6 @@ class FlowDemoItem: TIMFlowViewItem {
         }
         
         return item as? FlowDemoItem
-//        guard let cell = flowView.dequeueReuseable(identifier: flowCellId) else {
-//            return FlowDemoCell(with: flowCellId)
-//        }
-//        return cell as? FlowDemoCell
     }
     
     override init(frame: CGRect) {

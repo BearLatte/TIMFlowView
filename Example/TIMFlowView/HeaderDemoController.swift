@@ -23,8 +23,8 @@ class HeaderDemoController: UIViewController {
         let fView = TIMFlowView()
         fView.frame = view.bounds
         fView.contentInset = UIEdgeInsets(top: isIphoneX ? 88.0 : 64.0, left: 0, bottom: 0, right: 0)
-        fView.dataSource = self
-        fView.delegate   = self
+        fView.flowDataSource = self
+        fView.flowDelegate   = self
         fView.backgroundColor = UIColor.orange
         
         // 添加 banner 视图
