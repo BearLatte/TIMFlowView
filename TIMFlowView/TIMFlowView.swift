@@ -76,9 +76,6 @@ open class TIMFlowView: UIScrollView {
     
     /// 分区尾缓存池，存放已经划出屏幕 frame 的 分区尾视图
     private lazy var reuseableSectionFooter: Set<TIMFlowHeaderFooterView> = []
-    
-    /// 记录初始的偏移点
-    private var originOffsetY: CGFloat? = nil
 
     /// 需要悬停的header
     private var needFloatingHeader: [Int: TIMFlowHeaderFooterView] = [:]
@@ -461,12 +458,13 @@ extension TIMFlowView {
 
 extension TIMFlowView: UIScrollViewDelegate {
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if originOffsetY == nil {
-            originOffsetY = abs(contentOffset.y)
-        }
-        
         if floatingHeaderEnable {
-            offsetY = contentOffset.y + originOffsetY!
+            
+            if currentFloatingIndex >= needFloatingHeader.count || currentFloatingIndex < 0 {
+                return
+            }
+            
+            offsetY = contentOffset.y
             
             if offsetY <= 0 {
                 return
@@ -477,10 +475,9 @@ extension TIMFlowView: UIScrollViewDelegate {
                     return
                 }
                 
-                floatingHeader.frame = CGRect(x: 0, y: frame.minY + originOffsetY!, width: floatingHeader.bounds.width, height: floatingHeader.bounds.height)
+                floatingHeader.frame = CGRect(x: 0, y: frame.minY, width: floatingHeader.bounds.width, height: floatingHeader.bounds.height)
                 
-                let controller = topViewController((UIApplication.shared.keyWindow?.rootViewController)!)
-                controller.view.addSubview(floatingHeader)
+                superview?.addSubview(floatingHeader)
                 
                 // 取出当前索引分区内的item的frames，并获取当前分区的最大Y值
                 var sectionMaxY: CGFloat = 0
@@ -527,8 +524,8 @@ extension TIMFlowView: UIScrollViewDelegate {
                     return
                 }
                 
-                floatingHeader.frame = CGRect(x: 0, y: frame.minY + originOffsetY!, width: floatingHeader.bounds.width, height: floatingHeader.bounds.height)
-                UIApplication.shared.keyWindow?.addSubview(floatingHeader)
+                floatingHeader.frame = CGRect(x: 0, y: frame.minY, width: floatingHeader.bounds.width, height: floatingHeader.bounds.height)
+                superview?.addSubview(floatingHeader)
                 currentFloatingHeaderView = floatingHeader
                 
                 if currentFloatingIndex == 0 && currentFloatingHeaderView != nil {

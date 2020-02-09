@@ -48,6 +48,7 @@ class DemoViewController: UITableViewController {
             destination = DefaultDemoController()
         case 1:
             destination = HeaderDemoController()
+            
         case 2:
             destination = CollectionDemoController()
         default:
@@ -55,6 +56,7 @@ class DemoViewController: UITableViewController {
         }
         
         navigationController?.pushViewController(destination, animated: true)
+        
     }
 
 }

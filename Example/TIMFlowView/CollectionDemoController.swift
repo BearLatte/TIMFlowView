@@ -21,12 +21,13 @@ class CollectionDemoController: UIViewController {
 
     private func setupFlowView() {
        let fView = TIMFlowView()
-       fView.frame = view.bounds
-       fView.contentInset = UIEdgeInsets(top: isIphoneX ? 88.0 : 64.0, left: 0, bottom: 0, right: 0)
-       fView.flowDataSource = self
-       fView.flowDelegate   = self
-       fView.floatingHeaderEnable = true
-       fView.backgroundColor = UIColor.orange
+        let flowVY: CGFloat = isIphoneX ? 88.0 : 64.0
+        let height = kScreenHeight - flowVY
+        fView.frame = CGRect(x: 0, y: flowVY, width: view.bounds.width, height: height)
+        fView.flowDataSource = self
+        fView.flowDelegate   = self
+        fView.floatingHeaderEnable = true
+        fView.backgroundColor = UIColor.orange
        
        // 添加 banner 视图
        let headerView = DemoHeaderView.headerView(with: kScreenWidth * 0.56) { (index) in
@@ -134,5 +135,9 @@ extension CollectionDemoController: TIMFlowViewDelegate {
         let headerView = DemoSectionHeaderFooterView.headerFooterView(with: flowView)
         headerView?.sectionIndex = section
         return headerView
+    }
+    
+    func didSelected(in flowView: TIMFlowView, at indexPath: TIMIndexPath) {
+        print("点击了第\(indexPath.section)个分区的第\(indexPath.item)个item")
     }
 }

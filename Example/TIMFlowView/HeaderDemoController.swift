@@ -21,8 +21,9 @@ class HeaderDemoController: UIViewController {
     
     private func setupFlowView() {
         let fView = TIMFlowView()
-        fView.frame = view.bounds
-        fView.contentInset = UIEdgeInsets(top: isIphoneX ? 88.0 : 64.0, left: 0, bottom: 0, right: 0)
+        let flowVY: CGFloat = isIphoneX ? 88.0 : 64.0
+        let height = kScreenHeight - flowVY
+        fView.frame = CGRect(x: 0, y: flowVY, width: view.bounds.width, height: height)
         fView.flowDataSource = self
         fView.flowDelegate   = self
         fView.backgroundColor = UIColor.orange

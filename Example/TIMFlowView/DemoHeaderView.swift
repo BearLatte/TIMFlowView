@@ -50,7 +50,7 @@ class DemoHeaderView: TIMFlowHeaderView {
     }
     
     private var cycleView: ZCycleView!
-    private var tapAction: ((Int) -> ())? = nil
+    private var tapAction: ((Int) -> ())?
 }
 
 extension DemoHeaderView: ZCycleViewProtocol {
@@ -59,5 +59,9 @@ extension DemoHeaderView: ZCycleViewProtocol {
         imageView.layer.cornerRadius = 8.0
         imageView.layer.masksToBounds = true
         imageView.image = image
+    }
+    
+    func cycleViewDidSelectedIndex(_ cycleView: ZCycleView, index: Int) {
+        tapAction!(index)
     }
 }
