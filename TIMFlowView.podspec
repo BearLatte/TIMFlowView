@@ -2,7 +2,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'TIMFlowView'
-  s.version          = '1.0.1'
+  s.version          = '1.0.0'
   s.summary          = 'Swift 模仿 UITableView 写的一个瀑布流视图'
 
   s.description      = <<-DESC
