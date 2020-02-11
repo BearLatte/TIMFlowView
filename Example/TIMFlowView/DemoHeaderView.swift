@@ -8,11 +8,12 @@
 
 import TIMFlowView
 
-class DemoHeaderView: TIMFlowHeaderView {
+class DemoHeaderView: UIView {
     
     
     class func headerView(with height: CGFloat, tapAction: @escaping (_ index: Int) -> Void) -> DemoHeaderView {
-        let headerView = self.init(height: height)
+        let headerView = self.init()
+        headerView.frame = CGRect(x: 0, y: 0, width: 0, height: height)
         headerView.tapAction = tapAction
         return headerView
     }
@@ -29,12 +30,10 @@ class DemoHeaderView: TIMFlowHeaderView {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        contentView.frame = CGRect(x: 8.0, y: 8.0, width: frame.width - 2 * 8.0, height: frame.height - 2 * 8.0)
-        cycleView.frame = contentView.bounds
+        cycleView.frame = CGRect(x: 8.0, y: 8.0, width: frame.width - 2 * 8.0, height: frame.height - 2 * 8.0)
     }
     
     private func setupBannerView() {
-        contentView.layer.cornerRadius = 8.0
         
         let cycleView = ZCycleView()
         cycleView.delegate = self
@@ -44,7 +43,8 @@ class DemoHeaderView: TIMFlowHeaderView {
         cycleView.setImagesGroup([#imageLiteral(resourceName: "banner03"), #imageLiteral(resourceName: "banner01"), #imageLiteral(resourceName: "banner02")])
         cycleView.itemSpacing = 0
         cycleView.itemSize = CGSize(width: kScreenWidth - 2 * 8.0, height: kScreenWidth * 0.56 - 2 * 8.0)
-        contentView.addSubview(cycleView)
+        cycleView.layer.cornerRadius = 8.0
+        addSubview(cycleView)
         self.cycleView = cycleView
         
     }

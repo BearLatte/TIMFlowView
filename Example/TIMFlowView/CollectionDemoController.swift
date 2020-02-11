@@ -34,6 +34,14 @@ class CollectionDemoController: UIViewController {
            print("点击了第\(index)个banner")
        }
        fView.flowHeaderView = headerView
+        
+        let footerLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 0, height: 120.0))
+        footerLabel.text = "这是一个尾部视图的大title"
+        footerLabel.backgroundColor = #colorLiteral(red: 0.7308493557, green: 0.141261917, blue: 1, alpha: 1)
+        footerLabel.textColor = UIColor.white
+        footerLabel.font = UIFont.systemFont(ofSize: 25.0)
+        fView.flowFooterView = footerLabel
+        
        
        view.addSubview(fView)
        flowView = fView

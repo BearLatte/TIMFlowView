@@ -33,7 +33,7 @@ open class TIMFlowView: UIScrollView {
     
     /// 头视图
     /// 默认与 flowView 同宽，高度根据传进来高度自动计算
-    public var flowHeaderView: TIMFlowHeaderView? {
+    public var flowHeaderView: UIView? {
         willSet {
             guard let header = newValue else {
                 return
@@ -46,6 +46,10 @@ open class TIMFlowView: UIScrollView {
             floatingBeginY = header.frame.maxY
         }
     }
+    
+    /// 尾部视图
+    /// 默认与 flowView 同宽，高度根据传进来高度自动计算
+    public var flowFooterView: UIView?
     
     
     // MARK: - Private Property
@@ -272,91 +276,101 @@ public extension TIMFlowView {
         // 保留一个记录最大 Y 值的对象
         var maxY = flowHeaderView == nil ? 0.0 : flowHeaderView?.frame.height ??  0.0
         
-            // 根据分区计算每个 header、footer、cell 的 frame
-            for sectionIndex in 0 ..< numberOfSections {
-                // 保存 item 的宽度
-                let itemW = self.itemWidhth(in: sectionIndex)
-                
-                // 获取列数
-                let columns = self.numberOfColumns(section: sectionIndex)
-                
-                // 获取当前分区的 cell 的数量
-                let numberOfItems = (self.flowDataSource?.numberOfItems(in: self, at: sectionIndex))!
-                
-                // 获取当前分区的间距设置
-                let topMargin    = self.margin(at: sectionIndex, for: .top)
-                let leftMargin   = self.margin(at: sectionIndex, for: .left)
-                let bottomMargin = self.margin(at: sectionIndex, for: .bottom)
-                let columnMargin = self.margin(at: sectionIndex, for: .column)
-                let rowMargin    = self.margin(at: sectionIndex, for: .row)
-                
-                // 获取当前分区的头视图
-                if let sectionHeaederView = self.flowDelegate?.viewForSectionHeader(in: self, at: sectionIndex) {
-                    let sectionFrame = CGRect(x: 0, y: maxY, width: self.bounds.width, height: sectionHeaederView.frame.height)
-                    self.sectionHeaderFrames[sectionIndex] = sectionFrame
-                    if floatingHeaderEnable == true {
-                        sectionHeaederView.frame = sectionFrame
-                        needFloatingHeader[sectionIndex] = sectionHeaederView
-                    }
-                    maxY = sectionFrame.maxY
+        // 根据分区计算每个 header、footer、cell 的 frame
+        for sectionIndex in 0 ..< numberOfSections {
+            // 保存 item 的宽度
+            let itemW = self.itemWidhth(in: sectionIndex)
+            
+            // 获取列数
+            let columns = self.numberOfColumns(section: sectionIndex)
+            
+            // 获取当前分区的 cell 的数量
+            let numberOfItems = (self.flowDataSource?.numberOfItems(in: self, at: sectionIndex))!
+            
+            // 获取当前分区的间距设置
+            let topMargin    = self.margin(at: sectionIndex, for: .top)
+            let leftMargin   = self.margin(at: sectionIndex, for: .left)
+            let bottomMargin = self.margin(at: sectionIndex, for: .bottom)
+            let columnMargin = self.margin(at: sectionIndex, for: .column)
+            let rowMargin    = self.margin(at: sectionIndex, for: .row)
+            
+            // 获取当前分区的头视图
+            if let sectionHeaederView = self.flowDelegate?.viewForSectionHeader(in: self, at: sectionIndex) {
+                let sectionFrame = CGRect(x: 0, y: maxY, width: self.bounds.width, height: sectionHeaederView.frame.height)
+                self.sectionHeaderFrames[sectionIndex] = sectionFrame
+                if floatingHeaderEnable == true {
+                    sectionHeaederView.frame = sectionFrame
+                    needFloatingHeader[sectionIndex] = sectionHeaederView
                 }
+                maxY = sectionFrame.maxY
+            }
+            
+            // 计算某一列的最大Y值
+            var maxYOfColumns: [CGFloat] = []
+            for _ in 0 ..< columns {
+                maxYOfColumns.append(maxY)
+            }
+            
+            // 计算每个 item 的 frame
+            var itemFrames: [CGRect] = []
+            for itemIndex in 0 ..< numberOfItems {
+                let itemH = self.height(at: TIMIndexPath(sectionIndex, itemIndex))       // 高度
+                var itemColumn = 0                                                  // 当前列索引
+                var maxYOfItemColumn = maxYOfColumns[itemColumn]                    // 取出第一列的Y值
                 
-                // 计算某一列的最大Y值
-                var maxYOfColumns: [CGFloat] = []
-                for _ in 0 ..< columns {
-                    maxYOfColumns.append(maxY)
-                }
-                
-                // 计算每个 item 的 frame
-                var itemFrames: [CGRect] = []
-                for itemIndex in 0 ..< numberOfItems {
-                    let itemH = self.height(at: TIMIndexPath(sectionIndex, itemIndex))       // 高度
-                    var itemColumn = 0                                                  // 当前列索引
-                    var maxYOfItemColumn = maxYOfColumns[itemColumn]                    // 取出第一列的Y值
-                    
-                    for i in 0 ..< columns {
-                        if maxYOfColumns[i] < maxYOfItemColumn {
-                            itemColumn = i
-                            maxYOfItemColumn = maxYOfColumns[i]
-                        }
-                    }
-                    
-                    // 计算 item 的 x 坐标
-                    let itemX: CGFloat = leftMargin + CGFloat(itemColumn) * (columnMargin + itemW)
-                    var itemY: CGFloat = 0
-                    
-                    if maxYOfItemColumn == maxY {
-                        itemY = maxYOfItemColumn + topMargin
-                    } else {
-                        itemY = maxYOfItemColumn + rowMargin
-                    }
-                    
-                    let frame = CGRect(x: itemX, y: itemY, width: itemW, height: itemH)
-                    itemFrames.append(frame)
-                    maxYOfColumns[itemColumn] = frame.maxY
-                }
-                
-                self.itemFrames[sectionIndex] = itemFrames
-                
-                // 计算当前最大Y值
-                maxY = maxYOfColumns[0]
-                for i in 0 ..< maxYOfColumns.count {
-                    if maxY < maxYOfColumns[i] {
-                        maxY = maxYOfColumns[i]
+                for i in 0 ..< columns {
+                    if maxYOfColumns[i] < maxYOfItemColumn {
+                        itemColumn = i
+                        maxYOfItemColumn = maxYOfColumns[i]
                     }
                 }
                 
-                maxY = maxY + bottomMargin
+                // 计算 item 的 x 坐标
+                let itemX: CGFloat = leftMargin + CGFloat(itemColumn) * (columnMargin + itemW)
+                var itemY: CGFloat = 0
                 
-                if let sectionFooterView = self.flowDelegate?.viewForSectionFooter(in: self, at: sectionIndex) {
-                    let footerFrame = CGRect(x: 0, y: maxY, width: self.bounds.width, height: sectionFooterView.frame.height)
-                    self.sectionFooterFrames[sectionIndex] = footerFrame
-                    maxY = footerFrame.maxY
+                if maxYOfItemColumn == maxY {
+                    itemY = maxYOfItemColumn + topMargin
+                } else {
+                    itemY = maxYOfItemColumn + rowMargin
+                }
+                
+                let frame = CGRect(x: itemX, y: itemY, width: itemW, height: itemH)
+                itemFrames.append(frame)
+                maxYOfColumns[itemColumn] = frame.maxY
+            }
+            
+            self.itemFrames[sectionIndex] = itemFrames
+            
+            // 计算当前最大Y值
+            maxY = maxYOfColumns[0]
+            for i in 0 ..< maxYOfColumns.count {
+                if maxY < maxYOfColumns[i] {
+                    maxY = maxYOfColumns[i]
                 }
             }
             
-            self.contentSize = CGSize(width: 0, height: maxY)
-            self.setNeedsLayout()
+            maxY = maxY + bottomMargin
+            
+            if let sectionFooterView = self.flowDelegate?.viewForSectionFooter(in: self, at: sectionIndex) {
+                let footerFrame = CGRect(x: 0, y: maxY, width: self.bounds.width, height: sectionFooterView.frame.height)
+                self.sectionFooterFrames[sectionIndex] = footerFrame
+                maxY = footerFrame.maxY
+            }
+        }
+        
+        guard let footer = flowFooterView else {
+            contentSize = CGSize(width: 0, height: maxY)
+            setNeedsLayout()
+            return
+        }
+        
+        var footerFrame = footer.frame
+        footerFrame = CGRect(x: 0, y: maxY, width: bounds.width, height: footerFrame.size.height)
+        footer.frame = footerFrame
+        addSubview(footer)
+        contentSize = CGSize(width: 0, height: footerFrame.maxY)
+        setNeedsLayout()
     }
     
     // 从缓存池中获取 item
