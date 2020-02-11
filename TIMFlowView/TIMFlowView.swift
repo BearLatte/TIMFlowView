@@ -346,13 +346,13 @@ public extension TIMFlowView {
                     }
                 }
                 
+                maxY = maxY + bottomMargin
+                
                 if let sectionFooterView = self.flowDelegate?.viewForSectionFooter(in: self, at: sectionIndex) {
-                    let footerFrame = CGRect(x: 0, y: maxY + bottomMargin, width: self.bounds.width, height: sectionFooterView.frame.height)
+                    let footerFrame = CGRect(x: 0, y: maxY, width: self.bounds.width, height: sectionFooterView.frame.height)
                     self.sectionFooterFrames[sectionIndex] = footerFrame
                     maxY = footerFrame.maxY
                 }
-                
-                maxY = maxY + bottomMargin
             }
             
             self.contentSize = CGSize(width: 0, height: maxY)
@@ -480,15 +480,18 @@ extension TIMFlowView: UIScrollViewDelegate {
                 superview?.addSubview(floatingHeader)
                 
                 // 取出当前索引分区内的item的frames，并获取当前分区的最大Y值
-                var sectionMaxY: CGFloat = 0
-                if let itemFrames = itemFrames[currentFloatingIndex] {
-                    for i in 0 ..< itemFrames.count {
-                        sectionMaxY < itemFrames[i].maxY ? (sectionMaxY = itemFrames[i].maxY) : (sectionMaxY = sectionMaxY)
+                var sectionMaxY: CGFloat! = 0
+                if sectionFooterFrames[currentFloatingIndex] != nil {
+                    sectionMaxY = sectionFooterFrames[currentFloatingIndex]?.maxY
+                } else {
+                    if let itemFrames = itemFrames[currentFloatingIndex] {
+                        for i in 0 ..< itemFrames.count {
+                            sectionMaxY < itemFrames[i].maxY ? (sectionMaxY = itemFrames[i].maxY) : (sectionMaxY = sectionMaxY)
+                        }
+                        
+                        sectionMaxY += flowDelegate?.margin(in: self, at: currentFloatingIndex, for: .bottom) ?? 0
                     }
                 }
-                
-                sectionMaxY += flowDelegate?.margin(in: self, at: currentFloatingIndex, for: .bottom) ?? 0
-                
                 
                 if offsetY >= (sectionMaxY - floatingHeader.bounds.height) && offsetY < sectionMaxY {
                     let animationY = currentFloatingHeaderView!.frame.minY - (offsetY - (sectionMaxY - floatingHeader.bounds.height))
@@ -536,16 +539,4 @@ extension TIMFlowView: UIScrollViewDelegate {
             }
         }
     }
-    
-    /// 获取当前最顶层的控制器
-    func topViewController(_ vc: UIViewController) -> UIViewController {
-        if vc.isKind(of: UITabBarController.self) {
-            return topViewController((vc as! UITabBarController).selectedViewController!)
-        } else if vc.isKind(of: UINavigationController.self) {
-            return topViewController((vc as! UINavigationController).topViewController!)
-        } else {
-            return vc
-        }
-    }
-
 }

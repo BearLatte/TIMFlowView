@@ -137,6 +137,13 @@ extension CollectionDemoController: TIMFlowViewDelegate {
         return headerView
     }
     
+    func viewForSectionFooter(in flowView: TIMFlowView, at section: Int) -> TIMFlowHeaderFooterView? {
+        let footer = DemoSectionHeaderFooterView.headerFooterView(with: flowView)
+        footer?.isHeader = false
+        footer?.sectionIndex = section
+        return footer
+    }
+    
     func didSelected(in flowView: TIMFlowView, at indexPath: TIMIndexPath) {
         print("点击了第\(indexPath.section)个分区的第\(indexPath.item)个item")
     }

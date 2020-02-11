@@ -11,7 +11,17 @@ import TIMFlowView
 class DemoSectionHeaderFooterView: TIMFlowHeaderFooterView {
     var sectionIndex: Int? {
         willSet {
-            titleLabel.text = "当前第\(String(describing: newValue))个分区"
+            titleLabel.text = "当前第\(String(describing: newValue))个分区\(isHeader ? "头部视图" : "尾部视图")"
+        }
+    }
+    
+    var isHeader: Bool {
+        willSet {
+            if newValue == true {
+                backgroundColor = #colorLiteral(red: 0.2392156869, green: 0.6745098233, blue: 0.9686274529, alpha: 1)
+            } else {
+                backgroundColor = #colorLiteral(red: 0.02465939626, green: 0.8039215803, blue: 0.6574816938, alpha: 1)
+            }
         }
     }
     
@@ -28,6 +38,7 @@ class DemoSectionHeaderFooterView: TIMFlowHeaderFooterView {
     }
     
     override init(frame: CGRect) {
+        isHeader = true
         super.init(frame: frame)
         setupUI()
     }
